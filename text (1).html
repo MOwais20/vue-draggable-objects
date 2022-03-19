@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="app">
+        <v-app style="background-color: azure;">
+            <v-main>
+                <v-container class="d-flex flex-column justify-center align-center">
+
+                    <h1 class="mx-auto my-10">Draggable Objects</h1>
+
+                    <div>
+                        <v-switch v-model="draggable" :label="draggable ? 'Draggable' : 'UnDraggable - You can now reorder objects.'"></v-switch>
+                    </div>
+
+                    <draggable v-if="draggable" v-model="headers" group="people" @start="drag=true" @end="drag=false">
+                        <div class="boxes d-flex align-center justify-center font-weight-bold" :style="{backgroundColor: element.color, 
+                                bottom: draggable ? '' : element.bottom}" :class="element.class"
+                            v-for="element in headers" :key="element.name">{{
+                            element.text }}</div>
+                    </draggable>
+
+                    <div v-else @contextmenu="show" v-for="element in postionBox" :key="element.name"
+                        class="boxes d-flex align-center justify-center font-weight-bold" :style="{backgroundColor: element.color, 
+                        bottom: draggable ? '' : element.bottom, zIndex: element.zIndex}" :class="element.class"
+                        v-on:click.right="element.showMenu=true" :key="element.name">{{
+                        element.text }}</div>
+
+                    <v-menu :position-x="x" :position-y="y" absolute v-model="element.showMenu" offset-x
+                        v-for="element in postionBox" :key="element.name">
+                        <template>
+
+
+                        </template>
+                        <v-list>
+                            <v-list-item>
+                                <v-btn text block @click="element.zIndex += 1">Front</v-btn>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-btn text block @click="element.zIndex = 0">Back</v-btn>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+
+
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+
+
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                x: 0,
+                y: 0,
+                showMenu: false,
+                drag: false,
+                draggable: false,
+                heading: 'Data Table',
+                headers: [
+                    {
+                        text: 'Box 1',
+                        color: 'red',
+                        bottom: '0px',
+                        class: 'white--text'
+                    },
+                    { text: 'Box 2', color: 'blue', bottom: '0px', class: 'white--text' },
+                    { text: 'Box 3', color: 'yellow', bottom: '0px', class: '' },
+                ],
+                postionBox: [
+                    {
+                        text: 'Box 1',
+                        color: 'red',
+                        bottom: '-50px',
+                        class: 'white--text',
+                        showMenu: false,
+                        zIndex: 0
+                    },
+                    { text: 'Box 2', color: 'blue', bottom: '20px', class: 'white--text', showMenu: false, zIndex: 0 },
+                    { text: 'Box 3', color: 'yellow', bottom: '100px', class: '', showMenu: false, zIndex: 0 },
+                ],
+
+            },
+            methods: {
+                show(e) {
+                    e.preventDefault()
+                    this.showMenu = false
+                    this.x = e.clientX
+                    this.y = e.clientY
+                    this.$nextTick(() => {
+                        this.showMenu = true
+                    })
+                },
+            },
+        })
+    </script>
+
+    <style>
+        .boxes {
+            position: relative !important;
+            border-radius: 50%;
+            height: 200px;
+            width: 200px;
+        }
+    </style>
+</body>
+
+</html>
